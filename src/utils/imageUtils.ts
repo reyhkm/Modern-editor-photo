@@ -114,9 +114,6 @@ export const applyFiltersToCanvas = (
   flipH: boolean,
   flipV: boolean
 ) => {
-  // Reset canvas transformations
-  resetCanvasTransform(ctx, canvas);
-
   // Calculate new dimensions and position for rotation/flip
   let imgWidth = image.naturalWidth;
   let imgHeight = image.naturalHeight;
@@ -167,17 +164,13 @@ export const applyFiltersToCanvas = (
     applyPixelFilter(pixels, i, 'invert', filters.invert);
   }
 
-  // Apply blur separately as it needs the full pixel array
+  // Apply blur and put data back on canvas
   if (filters.blur > 0) {
     const blurredPixels = applyBlur(pixels, canvas.width, canvas.height, Math.floor(filters.blur));
-    imageData.data.set(blurredPixels);
+    const newImageData = new ImageData(blurredPixels, canvas.width, canvas.height);
+    ctx.putImageData(newImageData, 0, 0);
+  } else {
+    // Put the modified image data back on the canvas
+    ctx.putImageData(imageData, 0, 0);
   }
-
-  // Put the modified image data back on the canvas
-  ctx.putImageData(imageData, 0, 0);
-};
-
-export const resetCanvasTransform = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
-  ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset to identity matrix
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
 };
