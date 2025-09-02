@@ -167,7 +167,8 @@ export const applyFiltersToCanvas = (
   // Apply blur and put data back on canvas
   if (filters.blur > 0) {
     const blurredPixels = applyBlur(pixels, canvas.width, canvas.height, Math.floor(filters.blur));
-    const newImageData = new ImageData(blurredPixels, canvas.width, canvas.height);
+    const newImageData = ctx.createImageData(canvas.width, canvas.height);
+    newImageData.data.set(blurredPixels);
     ctx.putImageData(newImageData, 0, 0);
   } else {
     // Put the modified image data back on the canvas
