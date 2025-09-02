@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import Controls from './Controls';
-import { applyFiltersToCanvas, Filters, resetCanvasTransform, rotateCanvas, flipCanvas } from '../utils/imageUtils';
+import { applyFiltersToCanvas, Filters } from '../utils/imageUtils';
 
 const defaultFilters: Filters = {
   brightness: 100,

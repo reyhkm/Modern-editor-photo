@@ -1,16 +1,9 @@
 import React from 'react';
+import type { Filters } from '../utils/imageUtils';
 
 interface ControlsProps {
-  filters: {
-    brightness: number;
-    contrast: number;
-    saturation: number;
-    grayscale: number;
-    sepia: number;
-    invert: number;
-    blur: number;
-  };
-  onFilterChange: (filter: string, value: number) => void;
+  filters: Filters;
+  onFilterChange: (filter: keyof Filters, value: number) => void;
   onRotate: (direction: 'left' | 'right') => void;
   onFlip: (axis: 'horizontal' | 'vertical') => void;
   onReset: () => void;

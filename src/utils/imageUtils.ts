@@ -41,22 +41,11 @@ const applyPixelFilter = (pixel: Uint8ClampedArray, index: number, filter: keyof
       newB = gray * (1 - saturationFactor) + b * saturationFactor;
       break;
     case 'grayscale':
-      const grayValue = (r * 0.299 + g * 0.587 + b * 0.114) * (1 - value / 100) + (r * 0.299 + g * 0.587 + b * 0.114) * (value / 100);
-      newR = r * (1 - value / 100) + grayValue * (value / 100);
-      newG = g * (1 - value / 100) + grayValue * (value / 100);
-      newB = b * (1 - value / 100) + grayValue * (value / 100);
-      // A simpler grayscale application:
-      // const grayScaleFactor = value / 100;
-      // const avg = (r + g + b) / 3;
-      // newR = r * (1 - grayScaleFactor) + avg * grayScaleFactor;
-      // newG = g * (1 - grayScaleFactor) + avg * grayScaleFactor;
-      // newB = b * (1 - grayScaleFactor) + avg * grayScaleFactor;
-      // The above is more accurate for a percentage blend.
       const gsFactor = value / 100;
-      const avg = (r + g + b) / 3;
-      newR = r * (1 - gsFactor) + avg * gsFactor;
-      newG = g * (1 - gsFactor) + avg * gsFactor;
-      newB = b * (1 - gsFactor) + avg * gsFactor;
+      const grayVal = r * 0.299 + g * 0.587 + b * 0.114;
+      newR = r * (1 - gsFactor) + grayVal * gsFactor;
+      newG = g * (1 - gsFactor) + grayVal * gsFactor;
+      newB = b * (1 - gsFactor) + grayVal * gsFactor;
       break;
     case 'sepia':
       const sepiaFactor = value / 100;
@@ -85,8 +74,6 @@ const applyBlur = (pixels: Uint8ClampedArray, width: number, height: number, rad
   if (radius === 0) return pixels;
 
   const newPixels = new Uint8ClampedArray(pixels.length);
-  const kernelSize = radius * 2 + 1;
-  const kernelWeight = 1 / (kernelSize * kernelSize);
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -168,7 +155,7 @@ export const applyFiltersToCanvas = (
 
   // Get image data for pixel manipulation
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  let pixels = imageData.data;
+  const pixels = imageData.data;
 
   // Apply pixel-based filters
   for (let i = 0; i < pixels.length; i += 4) {
@@ -182,23 +169,15 @@ export const applyFiltersToCanvas = (
 
   // Apply blur separately as it needs the full pixel array
   if (filters.blur > 0) {
-    pixels = applyBlur(pixels, canvas.width, canvas.height, Math.floor(filters.blur));
+    const blurredPixels = applyBlur(pixels, canvas.width, canvas.height, Math.floor(filters.blur));
+    imageData.data.set(blurredPixels);
   }
 
   // Put the modified image data back on the canvas
-  ctx.putImageData(new ImageData(pixels, canvas.width, canvas.height), 0, 0);
+  ctx.putImageData(imageData, 0, 0);
 };
 
 export const resetCanvasTransform = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
   ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset to identity matrix
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-};
-
-// These are now handled within applyFiltersToCanvas for combined transformations
-export const rotateCanvas = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, angle: number) => {
-  // This function is now deprecated as rotation is handled in applyFiltersToCanvas
-};
-
-export const flipCanvas = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, axis: 'horizontal' | 'vertical') => {
-  // This function is now deprecated as flip is handled in applyFiltersToCanvas
 };
