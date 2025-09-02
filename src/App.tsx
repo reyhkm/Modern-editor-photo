@@ -1,5 +1,4 @@
 import ImageEditor from './components/ImageEditor';
-import './App.css'; // Specific styles for App if needed, otherwise index.css is enough
 
 function App() {
   return (
